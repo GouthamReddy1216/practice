@@ -6,6 +6,7 @@
 .pnp.js
 /server/.env
 /server/create_table.js
+/server/reset_db.js
 /notes.txt
 
 # testing

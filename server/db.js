@@ -14,27 +14,23 @@ function createConnection() {
 async function insert_db(term) {
   return new Promise((resolve, reject) => {
     const connection = createConnection();
-    
-    connection.connect((err) => {
-      if (err) {
-        return reject(err); // Handle connection errors
-      }
       console.log("Connected to the database");
-
       connection.query(
         "INSERT INTO search_terms (term, searched_on) VALUES (?, NOW())", 
         [term], 
         (err, result) => {
           if (err) {
             return reject(err); // Handle query errors
+            connection.end();
           }
-          console.log("Search term inserted:", result);
+          console.log("Search term inserted:", term ,result);
+          connection.end();
         }
       );
     });
-  })
-}
+  }
 
 module.exports = {
-  insert_db
+  insert_db,
+  createConnection
 };
