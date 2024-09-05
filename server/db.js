@@ -1,44 +1,52 @@
 const mysql = require('mysql2');
 require('dotenv').config(); // Load environment variables from .env
 
-// Create a pool of connections instead of single connections
-const pool = mysql.createPool({
-  host: process.env.DB_HOST,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_NAME,
-  port: process.env.PORT,
-  waitForConnections: true, // Allows waiting for an available connection
-  connectionLimit: 10, // Limit the number of connections in the pool
-  queueLimit: 0, // Unlimited queue limit
-});
+// Function to create a single connection
+function createConnection() {
+  return mysql.createConnection({
+    host: process.env.DB_HOST,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME,
+    port: process.env.PORT,
+    enableKeepAlive: true, // Keep the connection alive
+    keepAliveInitialDelay: 10000, // Set an initial delay for keep-alive
+  });
+}
 
 function insert_db(term) {
   return new Promise((resolve, reject) => {
-    // Get a connection from the pool
-    pool.getConnection((err, connection) => {
+    const connection = createConnection();
+
+    // Ensure connection is established
+    connection.connect((err) => {
       if (err) {
-        console.error("Error getting a connection from the pool", err);
+        console.error("Error connecting to the database:", err);
         return reject(err);
       }
 
       console.log("Connected to the database");
 
-      // Execute the query
+      // Perform the query
       connection.query(
         "INSERT INTO search_terms (term, searched_on) VALUES (?, NOW())",
         [term],
         (queryErr, result) => {
-          // Release the connection back to the pool
-          connection.release();
-
           if (queryErr) {
-            console.error("Error executing query", queryErr);
+            console.error("Error executing query:", queryErr);
+            connection.end(); // Close connection on query error
             return reject(queryErr);
           }
 
           console.log("Search term inserted:", term, result);
-          resolve(result);
+          connection.end((closeErr) => {
+            if (closeErr) {
+              console.error("Error closing the connection:", closeErr);
+              return reject(closeErr);
+            }
+            console.log("Connection closed");
+            resolve(result);
+          });
         }
       );
     });
@@ -47,4 +55,5 @@ function insert_db(term) {
 
 module.exports = {
   insert_db,
+  createConnection
 };
