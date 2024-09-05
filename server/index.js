@@ -13,18 +13,19 @@ const port = process.env.EXP_PORT;
 app.use(express.static(path.join(__dirname,'..','build')));
 
 // API endpoint for fetching movies
-app.get('/search', async (req, res) => {
-    try {
+app.get('/search', async (req, res) => {      
+    try {        
+        const title=req.query.title; 
+
         // Fetch movies from OMDB API
-        const title=req.query.title;       
-        await insert_db(title);
         const response = await fetch(`${API_URL}&s=${title}`);
-        const data = await response.json();
+        const data = await response.json();        
+        res.send(data);
         // Insert search term into the database
+        await insert_db(title);
         console.log(`Search term '${title}' inserted into the database`);
     
         // Send back the movie data as a response
-        res.send(data);
       }
        catch (error) {
             console.error('Error during API or DB operation:', error);

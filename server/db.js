@@ -26,18 +26,9 @@ async function insert_db(term) {
         [term], 
         (err, result) => {
           if (err) {
-            connection.end(); // Close the connection if there's an error
             return reject(err); // Handle query errors
           }
           console.log("Search term inserted:", result);
-
-          connection.end((endErr) => {
-            if (endErr) {
-              return reject(endErr); // Handle errors closing the connection
-            }
-            console.log("Connection closed");
-            resolve(result); // Resolve the promise with the result
-          });
         }
       );
     });
