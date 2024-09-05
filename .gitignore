@@ -5,6 +5,8 @@
 /.pnp
 .pnp.js
 /server/.env
+/server/create_table.js
+/notes.txt
 
 # testing
 /coverage
