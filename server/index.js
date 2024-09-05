@@ -14,19 +14,24 @@ app.use(express.static(path.join(__dirname,'..','build')));
 
 // API endpoint for fetching movies
 app.get('/search', async (req, res) => {      
-    try {        
-        const title=req.query.title; 
+    try {
+
+        const title=req.query.title;
+
+        if(title.length>0)
+        {
         const response = await fetch(`${API_URL}&s=${title}`);
-        const data = await response.json();        
+        const data = await response.json();
         res.send(data);
-        await insert_db(title);
-        console.log(`Search term '${title}' inserted into the database`);
-    
-      }
-       catch (error) {
-            console.error('Error during API or DB operation:', error);
-            res.status(500).json({ error: 'Error fetching data or inserting into database' });
+        const dbres=await insert_db(title);
         }
+        } 
+        catch (error) {
+        console.error('Error during API or DB operation:', error);
+            if (!res.headersSent) {
+                res.status(500).json({ error: 'Error fetching data or inserting into database' });
+            }
+    }
 });
 
 // Catch-all handler for any request that doesn't match the above routes

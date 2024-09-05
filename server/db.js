@@ -11,7 +11,7 @@ function createConnection() {
   });
 }
 
-async function insert_db(term) {
+ function insert_db(term) {
   return new Promise((resolve, reject) => {
     const connection = createConnection();
       console.log("Connected to the database");
@@ -19,12 +19,14 @@ async function insert_db(term) {
         "INSERT INTO search_terms (term, searched_on) VALUES (?, NOW())", 
         [term], 
         (err, result) => {
-          if (err) {
-            return reject(err); // Handle query errors
+          if (err) {            
             connection.end();
+            return reject(err); // Handle query errors
           }
-          console.log("Search term inserted:", term ,result);
+          console.log("Search term inserted:", term,result);
           connection.end();
+          console.log("conn closed");
+          resolve(result);
         }
       );
     });
