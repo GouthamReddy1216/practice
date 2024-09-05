@@ -7,7 +7,7 @@ const path = require('path');
 
 const app = express();
 const API_URL = process.env.API_KEY;
-const port = 3000;
+const port = process.env.EXP_PORT;
 
 // Serve static files from the React app's build directory
 app.use(express.static(path.join(__dirname,'..','build')));
