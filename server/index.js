@@ -17,11 +17,9 @@ app.get('/search', async (req, res) => {
     try {
         // Fetch movies from OMDB API
         const title=req.query.title;       
-        insert_db(title);
-
+        await insert_db(title);
         const response = await fetch(`${API_URL}&s=${title}`);
         const data = await response.json();
-    
         // Insert search term into the database
         console.log(`Search term '${title}' inserted into the database`);
     
