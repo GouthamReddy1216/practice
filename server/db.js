@@ -3,6 +3,8 @@ require('dotenv').config(); // Load environment variables from .env
 
 function createConnection() {
   return mysql.createConnection({
+    keepAliveInitialDelay: 10000, // 0 by default.
+    enableKeepAlive: true, // false by default.
     host: process.env.DB_HOST,
     user: process.env.DB_USER,
     password: process.env.DB_PASSWORD,
